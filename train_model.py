@@ -15,9 +15,9 @@ gbm_model = lgm.LGBMRegressor(
     objective="mean_absolute_error",
     learning_rate=0.01,
     boosting_type="gbdt",
-    colsample_bytree=0.55)
+    colsample_bytree=0.5)
 
-# Remember, raw data comes through the Pipeline
+# Remember, raw data comes through the Pipeline 
 # Is transformed by FeatureEngineerTransformer
 # And then passed to model
 
@@ -27,12 +27,9 @@ model_pipe = Pipeline(
     ("model", gbm_model)])
 
 params = {
-    "model__reg_alpha": [0, 10, 35, 50, 100],
-    "model__reg_lambda": [100, 200, 250, 300],
-    "model__max_depth": [10, 1000, 2500, None],
-    "model__num_leaves": [25, 50, 100, 250, None],
-    "model__subsample": [0.1, 0.2, 0.5, 0.8, 1],
-    "model__min_data_in_leaf": [20, 250, 500, 1000]
+    "model__reg_alpha": [0, 10, 25, 50, 100, 500],
+    "model__reg_lambda": [0, 10, 25, 50, 100, 500],
+    "model__max_depth": [10, 50, 100, None],
     }
 
 

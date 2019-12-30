@@ -44,9 +44,9 @@ def get_days_leading(date, holiday):
     
     return lead_up_frame
     
-def fill_in_period(exam_start, exam_end, period):
+def fill_in_period(start, end, period):
     
-    period_dates = pd.date_range(exam_start, exam_end)
+    period_dates = pd.date_range(start, end)
     
     period_frame = pd.DataFrame({'date':period_dates, 'period':period})
     
@@ -115,7 +115,6 @@ def update_special_days_db(db_loc = 'database/Western_Tweet_Data.sqlite3'):
     for d, h in zip(H.date, H.holiday):
         lead_ups.append(get_days_leading(d,h))
         
-
     lead_ups = pd.concat(lead_ups)
 
     with sqlite3.connect(db_loc) as con:
