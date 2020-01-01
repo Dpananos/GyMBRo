@@ -16,7 +16,7 @@ def make_validation_ix(X):
     n_obs, _ = X.shape
     ix = np.arange(n_obs)
 
-    max_year = X.created_at.dt.year.max()
+    max_year = pd.to_datetime('now').year
 
     # Need this to tell the model which part of X is training data and which is testing
     # Split doesn't happen until train time.
