@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OrdinalEncoder
+from sklearn.metrics import mean_absolute_error
 import pickle
 
 from .data_tools import fetch_training
@@ -62,8 +63,9 @@ def score_model():
     ix = X.created_at.dt.year == pd.to_datetime("today").year
     X, y = X.loc[ix,], y[ix]
     model = load_model()
-    score = model.score(X, y)
-    return score
+    score = model.score(X,y)
+
+    return np.round(score, 2)
 
 
 def compare_scores():
@@ -80,7 +82,7 @@ def compare_scores():
 
     model = load_model()
 
-    score_func = lambda X: -1 * model.score(X.drop("y", axis=1), X.y.values)
+    score_func = lambda X: model.score(X.drop("y", axis=1), X.y)
     scores = (X.groupby(["Month", "Set"]).apply(score_func)).unstack()
 
     return scores.loc[month_names,]
