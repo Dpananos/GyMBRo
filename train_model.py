@@ -36,7 +36,7 @@ model_pipe = Pipeline(
 )
 
 params = {"model__regressor__max_depth": [None, 10, 50, 100],
-         "moel__regressor__reg_alpha": [0, 10, 50, 100, 500],
+         "model__regressor__reg_alpha": [0, 10, 50, 100, 500],
          "model__regressor__reg_lambda": [0, 10, 50, 100, 500]
          }
 
@@ -46,7 +46,7 @@ gscv = GridSearchCV(
         model_pipe,
         param_grid=params,
         return_train_score=True,
-        verbose=10,
+        verbose=4,
         cv=cv_set,
         scoring="neg_mean_absolute_error",
         n_jobs=-1,
@@ -54,9 +54,11 @@ gscv = GridSearchCV(
         refit=True,
     )
 
-print("##################################################")
-print("MODEL SCORES ARE ON LOG SCALE.")
-print("##################################################")
+
+
+print('######################################')
+print('MODEL BEST SCORE: ', np.round(gscv.best_score_) )
+print('######################################')
 
 # The cv set still works even though I am slicing out the current year
 gscv.fit(X.iloc[training_ix,], y[training_ix])
