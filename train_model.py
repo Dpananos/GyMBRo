@@ -15,7 +15,6 @@ feature_engineer = FeatureEngineerTransformer()
 # Initialize model
 gbm_model = lgm.LGBMRegressor(
     n_estimators=1000,
-    objective="mean_absolute_error",
     learning_rate=0.01,
     boosting_type="gbdt",
     colsample_bytree=0.5,
@@ -37,7 +36,8 @@ model_pipe = Pipeline(
 
 params = {"model__regressor__max_depth": [None, 10, 50, 100],
          "model__regressor__reg_alpha": [0, 10, 50, 100, 500],
-         "model__regressor__reg_lambda": [0, 10, 50, 100, 500]
+         "model__regressor__reg_lambda": [0, 10, 50, 100, 500],
+         "model__regressor__objective": ['huber','mean_absolute_error']
          }
 
 training_ix, cv_set, testing_ix = make_validation_ix(X)
@@ -55,13 +55,13 @@ gscv = GridSearchCV(
     )
 
 
+# The cv set still works even though I am slicing out the current year
+gscv.fit(X.iloc[training_ix,], y[training_ix])
+
 
 print('######################################')
 print('MODEL BEST SCORE: ', np.round(gscv.best_score_) )
 print('######################################')
-
-# The cv set still works even though I am slicing out the current year
-gscv.fit(X.iloc[training_ix,], y[training_ix])
 
 # Save model
 with open("model.txt", "wb") as model_file:

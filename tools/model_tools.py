@@ -4,6 +4,7 @@ from sklearn.preprocessing import OrdinalEncoder
 from sklearn.metrics import mean_absolute_error
 import pickle
 
+from .data_tools import fetch_wr, fetch_weather
 from .data_tools import fetch_training
 from .transforms import *
 
@@ -66,6 +67,25 @@ def score_model():
     score = model.score(X,y)
 
     return np.round(score, 2)
+
+def score_today():
+
+
+    wr = fetch_wr()
+    if wr.shape[0]==0:
+        return "No observations.  Can not score model."
+    else:
+            
+        weather = fetch_weather().set_index('created_at')
+
+        df = pd.merge_asof(wr, weather, left_index = True, right_index = True).reset_index()
+        y = df.WR
+        df = df.drop('WR', axis = 'columns')
+
+        model = load_model()
+        score = model.score(df, y)
+
+        return np.round(score, 2)
 
 
 def compare_scores():
