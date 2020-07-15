@@ -1,4 +1,4 @@
-#! /Users/demetri/opt/miniconda3/envs/gymbo/bin/python
+#! /Users/demetri/miniconda3/envs/gymbo/bin/python
 
 from tools.db_tools import update_tweet_db, update_weather_db
 from tools.data_tools import fetch_wr
@@ -9,4 +9,4 @@ update_weather_db()
 wr = fetch_wr()
 preds = fetch_predictions()
 make_plot(preds,wr)
-tweet()
+# tweet()
