@@ -3,7 +3,7 @@ Code for a Weight Room Prediction Bot
 
 ## Introduction
 
-This repo contains code to run my **GyMRBo** (Gym Monitoring, But Robotically).  The functions here are capable of scraping gym data, updating an existing gym database, training/validating a machine learning algorithm,
+This repo contains code to run my **GyMRBo** (Gym Monitoring By Robot).  The functions here are capable of scraping gym data, updating an existing gym database, training/validating a machine learning algorithm,
 scoring the model's performance, and finally tweeting predictions from a dedicated twitter account.
 
 
