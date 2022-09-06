@@ -104,3 +104,4 @@ venv.bak/
 .mypy_cache/
 *.txt
 .DS_Store
+.Rproj.user
