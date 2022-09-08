@@ -19,8 +19,11 @@ drv = RSQLite::SQLite()
 con = DBI::dbConnect(drv, 'database/Western_Tweet_Data.sqlite3')
 
 tbl(con, 'PostCovidWr') %>% 
-  collect() ->f
+  collect() %>% 
+  mutate(created_at = ymd_hms(created_at)) %>% 
+  arrange(desc(created_at))->f
 
+view(f)
 
 f %>% 
   transmute(
