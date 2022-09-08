@@ -68,6 +68,8 @@ class TimeFeatureExtractor(BaseEstimator, TransformerMixin):
 
 
 class HolidayFeatureExtractor(BaseEstimator, TransformerMixin):
+    #TODO: This does not work, holidays are not coming up for 2022
+    #TODO: Fix the count down to Holidays so that on the holiday count is 0
 
     '''
     Sklearn transformer to deal with holidays.

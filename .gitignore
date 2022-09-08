@@ -112,3 +112,4 @@ venv.bak/
 .vscode
 GyMBRo.Rproj
 *__pycache__
+*.ipynb*
