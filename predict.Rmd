@@ -1,0 +1,107 @@
+
+
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(tidymodels)
+library(bonsai)
+library(lightgbm)
+drv <- RSQLite::SQLite()
+con <- DBI::dbConnect(drv, "database/Western_Tweet_Data.sqlite3")
+```
+
+
+
+```{sql, connection=con, output.var = forecast_set}
+WITH RECURSIVE dates(date) AS (
+  VALUES(datetime(strftime('%s', 'now') + (3600-strftime('%s', 'now') % 3600) , 'unixepoch', 'localtime'))
+  UNION ALL
+  SELECT datetime(date, '+1 hour')
+  FROM dates
+  WHERE date < datetime(strftime('%s', 'now') + (3600-strftime('%s', 'now') % 3600) + 2*3600, 'unixepoch', 'localtime')
+)
+SELECT 
+dates.date as created_at, 
+SpecialPeriods.period, 
+SpecialPeriods.is_period,
+SpecialPeriods.days_to
+FROM dates
+left 
+join SpecialPeriods on date(dates.date) = date(SpecialPeriods.date)
+;
+```
+
+
+
+
+```{r}
+prediction_times <- function(con){
+  
+  tdy<-today()
+  
+  tms <- seq(
+    ymd_hms(glue::glue('{tdy} 06:00:00'), tz = 'America/Toronto'),
+    ymd_hms(glue::glue('{tdy} 23:00:00'), tz = 'America/Toronto'),
+    by='1 hour'
+  )
+  
+  special_periods <- collect(tbl(con, 'SpecialPeriods'))  %>% 
+                     mutate(dt = date(date))
+  
+  prediction_frame <- tibble(created_at = tms) %>% 
+                      mutate(dt = date(created_at)) %>% 
+                      left_join(special_periods) %>% 
+                      select(-dt, -date)
+  
+  return(prediction_frame)
+  
+}
+
+observed<- tbl(con, 'PostCovidWR') %>% 
+  select(created_at, WR) %>% 
+  collect() %>% 
+  mutate(created_at = ymd_hms(created_at, tz = 'America/Toronto')) %>% 
+  filter(date(created_at) == date(now()))
+
+model <- readRDS("lgbm_wflw.rds")
+model$fit$fit$fit <- readRDS.lgb.Booster("lgbm_booster.rds")
+
+fmt_dt <- function(x){
+  
+  strftime(x, format = '%I %p') %>% 
+  str_remove( "^0+")
+
+  
+}
+
+base_plot <-prediction_times(con) %>% 
+  bind_cols(predict(model, .)) %>% 
+  ggplot(aes(created_at, .pred)) + 
+  geom_line(size=2, color = '#4F2683') + 
+  geom_point(data=observed, aes(created_at, WR), shape=21, color='black', fill='white')
+
+base_plot + 
+  labs(x='Time', y = 'People in Weight Room') + 
+  scale_y_continuous(limits = c(0, NA)) + 
+  scale_x_datetime(labels = fmt_dt, date_breaks = '4 hours') + 
+  theme_classic() + 
+  theme(
+    panel.grid.major = element_line(),
+    panel.grid.minor = element_line(),
+    aspect.ratio = 1/1.61
+  )
+
+ggsave("predicted.png", height = 3, width = 3 * 1.61)
+```
+
+
+```{r}
+library(rtweet)
+auth <- rtweet_user()
+
+auth_as('/Users/demetripananos/Library/Preferences/org.R-project.R/R/rtweet/GyMBRo.rds')
+
+post_tweet(status = '', media = c('predicted.png'), media_alt_text = c('')) 
+```
+
