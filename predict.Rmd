@@ -64,8 +64,8 @@ observed<- tbl(con, 'PostCovidWR') %>%
   mutate(created_at = ymd_hms(created_at, tz = 'America/Toronto')) %>% 
   filter(date(created_at) == date(now()))
 
-model <- readRDS("lgbm_wflw.rds")
-model$fit$fit$fit <- readRDS.lgb.Booster("lgbm_booster.rds")
+model <- readRDS("models/lgbm_wflw.rds")
+model$fit$fit$fit <- readRDS.lgb.Booster("models/lgbm_booster.rds")
 
 fmt_dt <- function(x){
   
@@ -97,11 +97,29 @@ ggsave("predicted.png", height = 3, width = 3 * 1.61)
 
 
 ```{r}
+f<-forecast_set %>% 
+  mutate(created_at = ymd_hms(created_at, tz = 'America/Toronto')) %>% 
+  bind_cols(predict(model, .)) %>% 
+  mutate(.pred = round(.pred),
+         Time = fmt_dt(created_at)) %>% 
+  rename(Prediction = .pred) %>% 
+  select(Time, Prediction) %>% 
+  knitr::kable("simple") %>% 
+  format() %>% 
+  paste0(collapse = "\n")
+
+
+
+
+```
+
+
+```{r}
 library(rtweet)
-auth <- rtweet_user()
 
-auth_as('/Users/demetripananos/Library/Preferences/org.R-project.R/R/rtweet/GyMBRo.rds')
 
-post_tweet(status = '', media = c('predicted.png'), media_alt_text = c('')) 
+auth_as('credentials/GyMBRo.rds')
+
+post_tweet(status = f, media = c('predicted.png'), media_alt_text = c(''))
 ```
 

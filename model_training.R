@@ -10,8 +10,7 @@ con <- DBI::dbConnect(drv, "database/Western_Tweet_Data.sqlite3")
 
 wr <- con %>% 
       wr_numbers() %>% 
-      mutate(created_at = ymd_hms(created_at))
-
+      mutate(created_at = ymd_hms(created_at, tz = 'America/Toronto'))
 
 DBI::dbDisconnect(con)
 
