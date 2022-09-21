@@ -104,3 +104,13 @@ venv.bak/
 .mypy_cache/
 *.txt
 .DS_Store
+.Rproj.user
+
+# Others 
+.pytest_cache
+.Rproj.user
+.vscode
+GyMBRo.Rproj
+*__pycache__
+*.ipynb*
+credentials
