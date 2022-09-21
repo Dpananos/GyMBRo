@@ -2,7 +2,7 @@
 % Please edit documentation in R/scrape.R
 \name{write_to_db}
 \alias{write_to_db}
-\title{WRite a dataframe to database}
+\title{Write a dataframe to database}
 \usage{
 write_to_db(data, con)
 }
@@ -12,7 +12,7 @@ write_to_db(data, con)
 \item{con}{db connection}
 }
 \description{
-WRite a dataframe to database
+Write a dataframe to database
 }
 \examples{
 # NORUN

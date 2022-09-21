@@ -18,5 +18,5 @@ int
 Extract number from tweet
 }
 \examples{
-# NOT RUN 
+# NOT RUN
 }

@@ -15,6 +15,9 @@ LazyData: true
 Imports: 
     DBI,
     dplyr,
+    glue,
+    here,
+    lightgbm,
     lubridate,
     magrittr,
     RSQLite,
