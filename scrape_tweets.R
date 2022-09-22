@@ -21,13 +21,29 @@ log_info("Found {nrow(new_tweets)} new tweets")
 
 if (nrow(new_tweets) > 0) {
     log_success("Writing to Database")
-    new_tweets %>% 
+    scraped <- new_tweets %>% 
       mutate(
         cleaned_tweet = clean_tweet(text),
         WR = get_number(cleaned_tweet, 'WR'),
         CM = get_number(cleaned_tweet, 'CM'),
         SPIN = get_number(cleaned_tweet, "SPIN")
-      ) %>% 
+      )
+    
+    NAs <- scraped %>% 
+           summarise_at(vars(WR:SPIN), ~sum(is.na(.)))
+    
+    if(NAs$WR>0) {
+      log_error('{NAs$WR} WR counts are NA')
+    }
+    if(NAs$CM>0) {
+      log_error('{NAs$CM} CM counts are NA')
+    }
+    if(NAs$SPIN>0) {
+      log_error('{NAs$SPIN} SPIN counts are NA')
+    }
+
+    
+    scraped %>% 
     write_to_db(con)
 }
 

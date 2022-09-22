@@ -39,7 +39,13 @@ if(nrow(fs) > 0) {
   auth_as('credentials/GyMBRo.rds')
   
   log_info("----Tweeting----")
-  post_tweet(status = tweet_text, media = c('predicted.png'), media_alt_text = c(''))
+  
+
+  post_tweet(
+    status = tweet_text, 
+    media = c('predicted.png'), 
+    media_alt_text = c('')
+    )
   
   
 }
