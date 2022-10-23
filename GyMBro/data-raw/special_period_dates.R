@@ -21,6 +21,9 @@ fill_in_dates <- function(start, end, period) {
 }
 
 
+
+
+
 file <- here("data-raw/special_periods_dates.csv")
 special_period_dates <- read_csv(file)
 
@@ -57,13 +60,17 @@ winter_breaks <- special_period_dates %>%
 
 reading_break_days <- map2_dfr(winter_breaks$`Reading Week Start`, winter_breaks$`Reading Week End`, fill_in_dates, "Reading Week")
 
+# Add in the hoco
+
+
+
 breaks <- bind_rows(reading_break_days, fall_break_days)
 
 
 special_period_dates <- dates %>%
   left_join(leadups) %>%
   left_join(breaks) %>%
-  mutate(date = as.character(date))
+  mutate(date = as.character(date)) 
 
 
 DBI::dbWriteTable(con, "SpecialPeriods", special_period_dates, overwrite=T)

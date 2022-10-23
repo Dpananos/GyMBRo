@@ -26,7 +26,7 @@ wr_numbers <- function(con) {
     dplyr::mutate(dt = lubridate::date(lubridate::ymd_hms(created_at))) %>%
     dplyr::left_join(special_periods) %>%
     dplyr::select(-dt, -date) %>%
-    filter(!is.na(WR))
+    dplyr::filter(!is.na(WR))
 
   return(wr)
 }
@@ -67,7 +67,7 @@ forecast_set <- function(con) {
   "
 
   forecast_frame <- DBI::dbGetQuery(con, query) %>%
-    mutate(
+    dplyr::mutate(
       created_at = lubridate::ymd_hms(created_at,tz = "America/Toronto"
       )
     )
@@ -97,7 +97,7 @@ observed_set <- function(con) {
   "
 
   observed <- DBI::dbGetQuery(con, query) %>%
-    mutate(
+    dplyr::mutate(
       created_at = lubridate::ymd_hms(created_at,
         tz = "America/Toronto"
       )
