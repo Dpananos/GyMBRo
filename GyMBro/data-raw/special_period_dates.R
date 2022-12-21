@@ -70,7 +70,10 @@ breaks <- bind_rows(reading_break_days, fall_break_days)
 special_period_dates <- dates %>%
   left_join(leadups) %>%
   left_join(breaks) %>%
-  mutate(date = as.character(date)) 
+  mutate(date = as.character(date)) %>% 
+  group_by(date) %>% 
+  arrange(date, days_to) %>% 
+  distinct(date, .keep_all = T)
 
 
 DBI::dbWriteTable(con, "SpecialPeriods", special_period_dates, overwrite=T)
