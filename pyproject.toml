@@ -1,0 +1,5 @@
+[tool.pytest.ini_options]
+addopts = "--cov=gymbro -v"
+testpaths = [
+    "gymbro/tests"
+]

@@ -1,0 +1,10 @@
+*/__pycache__
+.pytest_cache
+.env
+.coverage
+.ipynb_checkpoints
+*.ipynb
+*.cpython*
+.vscode
+postgres-docker
+logs
