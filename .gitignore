@@ -7,4 +7,5 @@
 *.cpython*
 .vscode
 postgres-docker
-logs
+*.log
+.DS_Store
