@@ -25,6 +25,7 @@ class TwitterApiKeys:
 
     @classmethod
     def from_env(cls):
+        
         return cls(
             CLIENT_ID=os.environ["CLIENT_ID"],
             CLIENT_SECRET=os.environ["CLIENT_SECRET"],
@@ -75,7 +76,7 @@ class Scraper:
         # If we want more than the 100 limit, we need to repeatedly call
         # self.scrape_data until we get no more tweets.
         if more_tweets:
-            while response.meta["next_token"]:
+            while "next_token" in response.meta.keys():
 
                 response = self.scrape_data(
                     client=client,
@@ -94,6 +95,13 @@ def fetch_latest_tweet_id(cur):
     """
     Fetch the latest tweet id from the database.
     """
-    cur.execute('SELECT "id" from tweets order by created_at desc limit 1')
-    latest_tweet_id = cur.fetchall()[0]
+    cur.execute('SELECT "id" from fact_tweets order by created_at desc limit 1')
+
+    latest_tweet_id = cur.fetchall()
+
+    if latest_tweet_id:
+        latest_tweet_id = latest_tweet_id[0]
+    else:
+        latest_tweet_id = None
+
     return latest_tweet_id
