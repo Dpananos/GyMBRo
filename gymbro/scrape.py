@@ -97,7 +97,7 @@ def fetch_latest_tweet_id(cur):
     """
     cur.execute('SELECT "id" from fact_tweets order by created_at desc limit 1')
 
-    latest_tweet_id = cur.fetchall()
+    latest_tweet_id, *_ = cur.fetchall()
 
     if latest_tweet_id:
         latest_tweet_id = latest_tweet_id[0]
