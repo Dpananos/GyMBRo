@@ -47,7 +47,7 @@ def get_number_after_substring(cleaned_text: str, slug: TweetSlug) -> int:
     Used for extracting how many users are in each room from a tweet.
     """
 
-    #TODO: Add resiliency to this function. If the slug is not found, 
+    # TODO: Add resiliency to this function. If the slug is not found,
     # look for a fuzzy match. If no fuzzy match is found, raise an error.
     # Get the number after the substring using regex
     try:

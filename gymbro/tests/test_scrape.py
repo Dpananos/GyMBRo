@@ -5,14 +5,15 @@ from gymbro.connect import SqlConnection
 from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser
 
 
-user = TwitterUser(id=297549322, username='WesternWeightRm')
+user = TwitterUser(id=297549322, username="WesternWeightRm")
 api_keys = TwitterApiKeys.from_env()
 scraper = Scraper(user=user, api_keys=api_keys)
 
 
 class TestScraper:
-
-    @pytest.mark.parametrize("max_results, expected_length", zip([10, 20, 100], [10, 20, 100]))
+    @pytest.mark.parametrize(
+        "max_results, expected_length", zip([10, 20, 100], [10, 20, 100])
+    )
     def test_scrape_data_length(self, max_results, expected_length):
         # Test that the scrape_data method returns a list of tweets
         client = tweepy.Client(api_keys.BEARER_TOKEN)

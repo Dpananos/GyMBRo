@@ -25,7 +25,7 @@ class TwitterApiKeys:
 
     @classmethod
     def from_env(cls):
-        
+
         return cls(
             CLIENT_ID=os.environ["CLIENT_ID"],
             CLIENT_SECRET=os.environ["CLIENT_SECRET"],
@@ -54,10 +54,10 @@ class Scraper:
         """
 
         response = client.get_users_tweets(
-            id=self.user.id, 
+            id=self.user.id,
             tweet_fields=self.user.tweet_fields,
             exclude="retweets",
-             **kwargs
+            **kwargs
         )
 
         return response
@@ -66,7 +66,7 @@ class Scraper:
 
         client = tweepy.Client(self.api_keys.BEARER_TOKEN)
 
-        # Initialize somewhere to store the tweets. Output of self.scrape_data 
+        # Initialize somewhere to store the tweets. Output of self.scrape_data
         # is a response and not a list of tweets.
         output_data = []
 
