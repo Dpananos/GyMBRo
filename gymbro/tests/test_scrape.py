@@ -1,60 +1,39 @@
-from gymbro.clean import clean_tweet, get_number_after_substring, TweetSlug
+import tweepy
 import pytest
+from datetime import datetime
+from gymbro.connect import SqlConnection
+from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser, fetch_latest_tweet_id
 
-raw_tweets = [
-    'WR 35 🙊 CM 8 🙈  SPIN 1🐵' ,
-    'WR 33   CM 9    SPIN 1',
-    'WR 35   CM 4    SPIN 2',
-    'WR 32   CM 3    SPIN 1',
-    'WR 43🌟  CM 7🌲   Spin 3🎁',
-    'WR: 31  CM: 4   Spin: 3',
-    'WR 27   CM 5    Spin 2']
 
-cleaned_tweets = [
-    'WR 35 CM 8 SPIN 1',
-    'WR 33 CM 9 SPIN 1',
-    'WR 35 CM 4 SPIN 2',
-    'WR 32 CM 3 SPIN 1',
-    'WR 43 CM 7 SPIN 3',
-    'WR 31 CM 4 SPIN 3',
-    'WR 27 CM 5 SPIN 2']
+user = TwitterUser(id=297549322, username='WesternWeightRm')
+api_keys = TwitterApiKeys.from_env()
+scraper = Scraper(user=user, api_keys=api_keys)
 
-WR_numbers = [35, 33, 35, 32, 43, 31, 27]
-CM_numbers = [8, 9, 4, 3, 7, 4, 5]
-SPIN_numbers = [1, 1, 2, 1, 3, 3, 2]
 
-class TestCleanTweet:
+class TestScraper:
+    def test_fetch_latest_tweet_id(self):
 
-    @pytest.mark.parametrize("raw_tweet, cleaned_tweet", zip(raw_tweets, cleaned_tweets))
-    def test_clean_tweets(self, raw_tweet, cleaned_tweet):
-        assert clean_tweet(raw_tweet) == cleaned_tweet
+        # Connect to a test database where I have kept tweets from 2022-09-08
+        with SqlConnection.from_env(file_path='.test.env').connect() as con:
+            cur = con.cursor()
+            latest_tweet_id = fetch_latest_tweet_id(cur)
+            cur.close()
+            assert latest_tweet_id == 1568020944689692672
 
-class TestGetNumberAfterSubstring:
+    @pytest.mark.parametrize("max_results, expected_length", zip([10, 20, 100], [10, 20, 100]))
+    def test_scrape_data_length(self, max_results, expected_length):
+        # Test that the scrape_data method returns a list of tweets
+        client = tweepy.Client(api_keys.BEARER_TOKEN)
 
-    @pytest.mark.parametrize("cleaned_tweet, wr_number", zip(cleaned_tweets, WR_numbers))
-    def test_wr_extract(self, cleaned_tweet, wr_number):
-        assert get_number_after_substring(cleaned_tweet, TweetSlug.WR) == wr_number
+        response = scraper.scrape_data(client=client, max_results=max_results)
 
-    @pytest.mark.parametrize("cleaned_tweet, cm_number", zip(cleaned_tweets, CM_numbers))
-    def test_cm_extract(self, cleaned_tweet, cm_number):
-        assert get_number_after_substring(cleaned_tweet, TweetSlug.CM) == cm_number
+        assert len(response.data) == expected_length
 
-    @pytest.mark.parametrize("cleaned_tweet, spin_number", zip(cleaned_tweets, SPIN_numbers))
-    def test_spin_extract(self, cleaned_tweet, spin_number):
-        assert get_number_after_substring(cleaned_tweet, TweetSlug.SPIN) == spin_number
+    def test_get_tweets_since_id(self):
 
-    def test_no_slug_found(self):
-        with pytest.raises(Exception):
-            get_number_after_substring("WR 27 CM 5 SPIN 2", TweetSlug.CYCLE)
+        client = tweepy.Client(api_keys.BEARER_TOKEN)
 
-        with pytest.raises(Exception):
-            get_number_after_substring("WR CM 5 SPIN 2", TweetSlug.WR)
+        response = scraper.scrape_data(client=client, max_results=100, since_id=1568020944689692672)
 
-        with pytest.raises(Exception):
-            get_number_after_substring("CM 5 SPIN 2", TweetSlug.WR)
-
-        with pytest.raises(Exception):
-            get_number_after_substring("WR 12 SPIN 2", TweetSlug.CM)
-
-        with pytest.raises(Exception):
-            get_number_after_substring("WR 12 CM 5 SPN 12", TweetSlug.SPIN)
+        for tweet in response.data:
+            assert tweet.created_at.date() > datetime(2022, 9, 8).date()
