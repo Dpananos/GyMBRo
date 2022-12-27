@@ -1,9 +1,9 @@
-import os
-import psycopg2
+
 import logging
 from datetime import date
 from dotenv import load_dotenv
-from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser, fetch_latest_tweet_id
+from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser
+from gymbro.connect import SqlConnection, SqlTable
 
 load_dotenv()
 
@@ -22,19 +22,22 @@ api_keys = TwitterApiKeys.from_env()
 scraper = Scraper(user=user, api_keys=api_keys)
 
 
-with psycopg2.connect(user='postgres', password='postgres', host='localhost', port=5432, database="gymbro") as con:
+with SqlConnection.from_env().connect() as con:
 
-    cur = con.cursor()
-    latest_tweet_id = fetch_latest_tweet_id(cur)
-    tweets = scraper.get_tweets(max_results=100, since_id=latest_tweet_id)
+    table = SqlTable("fact_tweets", con)
+    latest_tweet_id = table.last_observation()
+    tweets = scraper.get_tweets(more_tweets=True, max_results=100, since_id=latest_tweet_id)
 
     if tweets:
+        logging.info(f'Found new tweets for')
         for tweet in tweets:
 
-            cur.execute("INSERT INTO tweets (id, created_at, author_id, text) VALUES (%s, %s, %s, %s)", (tweet.id, tweet.created_at, tweet.author_id, tweet.text))
-            logging.info(f'Inserted tweet {tweet.id}')
+            table.insert(
+                        'INSERT INTO fact_tweets (id, created_at, author_id, text) VALUES (%s, %s, %s, %s)',
+                        (tweet.id, tweet.created_at, tweet.author_id, tweet.text)
+                        )
 
-        cur.close()
         con.commit()
+                        
     else:
         logging.info(f'No new tweets for {user.username}')

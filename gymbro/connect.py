@@ -1,5 +1,4 @@
 import psycopg2
-import os
 from dotenv import dotenv_values
 from dataclasses import dataclass
 
@@ -37,3 +36,40 @@ class SqlConnection:
             user=config["DB_USER"],
             password=config["DB_PASSWORD"],
         )
+
+class SqlTable:
+
+    def __init__(self, name, connection):
+
+        self.name = name
+        self.connection = connection
+
+    def last_observation(self):
+
+        with self.connection.cursor() as cur:
+            cur.execute('SELECT "id" FROM {} order by created_at desc LIMIT 1'.format(self.name))
+            last_obs = cur.fetchone()
+
+            if last_obs:
+                return last_obs[0]
+            else:
+                return None
+
+    def query(self, query, fetchall=True):
+
+        with self.connection.cursor() as cur:
+            cur.execute(query)
+
+            # When testing this class, I write and delete an observation from the test db
+            # In order to remove that observation, i need to execute a query but doing `fetchall` on a drop command
+            # results in a psycopg2.ProgrammingError: no results to fetch
+            # So I added the `fetchall` argument to the query method to allow me to execute a query without fetching all results
+            if fetchall:
+                return cur.fetchall()
+            else:
+                return self
+                
+    def insert(self, query, values):
+
+        with self.connection.cursor() as cur:
+            cur.execute(query, values)

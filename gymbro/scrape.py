@@ -54,7 +54,10 @@ class Scraper:
         """
 
         response = client.get_users_tweets(
-            id=self.user.id, tweet_fields=self.user.tweet_fields, **kwargs
+            id=self.user.id, 
+            tweet_fields=self.user.tweet_fields,
+            exclude="retweets",
+             **kwargs
         )
 
         return response
@@ -90,18 +93,3 @@ class Scraper:
                     break
 
         return output_data
-
-def fetch_latest_tweet_id(cur):
-    """
-    Fetch the latest tweet id from the database.
-    """
-    cur.execute('SELECT "id" from fact_tweets order by created_at desc limit 1')
-
-    latest_tweet_id, *_ = cur.fetchall()
-
-    if latest_tweet_id:
-        latest_tweet_id = latest_tweet_id[0]
-    else:
-        latest_tweet_id = None
-
-    return latest_tweet_id
