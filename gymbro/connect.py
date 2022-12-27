@@ -40,11 +40,10 @@ class SqlConnection:
 
 class SqlTable:
     # TODO:  Clean this up by adding column names to the table class and editing the insert method to use them.
+    def __init__(self, connection, name):
 
-    def __init__(self, name, connection):
-
-        self.name = name
         self.connection = connection
+        self.name = name
 
     def last_observation(self):
 

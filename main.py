@@ -17,18 +17,18 @@ logging.basicConfig(
     format="%(asctime)s:%(filename)s:%(levelname)s:%(name)s:%(message)s",
 )
 
-
 user = TwitterUser(id=297549322, username="WesternWeightRm")
 api_keys = TwitterApiKeys.from_env()
 scraper = Scraper(user=user, api_keys=api_keys)
 
-
 with SqlConnection.from_env().connect() as con:
 
-    table = SqlTable("fact_tweets", con)
+    table = SqlTable(connection=con, name="fact_tweets")
     latest_tweet_id = table.last_observation()
     tweets = scraper.get_tweets(
-        more_tweets=True, max_results=100, since_id=latest_tweet_id
+        more_tweets=True, 
+        max_results=100, 
+        since_id=latest_tweet_id
     )
 
     if tweets:
