@@ -2,7 +2,7 @@ import logging
 from datetime import date
 from dotenv import load_dotenv
 from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser
-from gymbro.connect import SqlConnection, SqlTable
+from gymbro.connect import SqlConnection
 
 load_dotenv()
 
@@ -17,30 +17,43 @@ logging.basicConfig(
     format="%(asctime)s:%(filename)s:%(levelname)s:%(name)s:%(message)s",
 )
 
-user = TwitterUser(id=297549322, username="WesternWeightRm")
-api_keys = TwitterApiKeys.from_env()
-scraper = Scraper(user=user, api_keys=api_keys)
 
-with SqlConnection.from_env().connect() as con:
+def main():
+        
+    user = TwitterUser(id=297549322, username="WesternWeightRm")
+    api_keys = TwitterApiKeys.from_env()
+    scraper = Scraper(user=user, api_keys=api_keys)
 
-    table = SqlTable(connection=con, name="fact_tweets")
-    latest_tweet_id = table.last_observation()
-    tweets = scraper.get_tweets(
-        more_tweets=True, 
-        max_results=100, 
-        since_id=latest_tweet_id
-    )
+    with SqlConnection.from_env().connect() as con:
 
-    if tweets:
-        logging.info(f"Found new tweets for")
-        for tweet in tweets:
+        cursor = con.cursor()
 
-            table.insert(
-                "INSERT INTO fact_tweets (id, created_at, author_id, text) VALUES (%s, %s, %s, %s)",
-                (tweet.id, tweet.created_at, tweet.author_id, tweet.text),
-            )
+        latest_observation_query= 'SELECT "id" FROM fact_tweets order by created_at desc LIMIT 1'
+        latest_observation = cursor.execute(latest_observation_query)
 
-        con.commit()
+        if latest_observation:
+            latest_tweet_id = latest_observation[0][0]
+        else:
+            latest_tweet_id = None
 
-    else:
-        logging.info(f"No new tweets for {user.username}")
+        tweets = scraper.get_tweets(more_tweets=True, max_results=100, since_id=latest_tweet_id)
+
+        if tweets:
+
+            logging.info(f"Found new tweets for")
+
+            for tweet in tweets:
+
+                cursor.execute(
+                    "INSERT INTO fact_tweets (id, created_at, author_id, text) VALUES (%s, %s, %s, %s)",
+                    (tweet.id, tweet.created_at, tweet.author_id, tweet.text),
+                )
+
+            con.commit()
+
+        else:
+            logging.info(f"No new tweets for {user.username}")
+
+
+if __name__ == "__main__":
+    main()
