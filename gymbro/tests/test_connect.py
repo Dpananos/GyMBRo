@@ -2,7 +2,7 @@ import os
 import datetime
 import pytest
 import psycopg2
-from gymbro.connect import SqlConnection, SqlTable
+from gymbro.connect import SqlConnection
 
 
 def test_conect():
