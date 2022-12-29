@@ -28,7 +28,7 @@ def main():
 
         cursor = con.cursor()
 
-        latest_observation_query= 'SELECT "id" FROM fact_tweets order by created_at desc LIMIT 1'
+        latest_observation_query= 'SELECT "id" FROM fact_tweets order by created_at_utc desc LIMIT 1'
         latest_observation = cursor.execute(latest_observation_query)
 
         if latest_observation:
@@ -45,7 +45,7 @@ def main():
             for tweet in tweets:
 
                 cursor.execute(
-                    "INSERT INTO fact_tweets (id, created_at, author_id, text) VALUES (%s, %s, %s, %s)",
+                    "INSERT INTO fact_tweets (id, created_at_utc, author_id, text) VALUES (%s, %s, %s, %s)",
                     (tweet.id, tweet.created_at, tweet.author_id, tweet.text),
                 )
 

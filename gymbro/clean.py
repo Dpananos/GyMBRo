@@ -1,7 +1,8 @@
 import re
 from typing import List
 from enum import Enum
-from datetime import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 class TweetSlug(Enum):
     WR = "WR"
@@ -55,3 +56,16 @@ def get_number_after_substring(cleaned_text: str, slug: TweetSlug) -> int:
         return int(number)
     except AttributeError:
         raise NoSlugFoundError(cleaned_text=cleaned_text, slug=slug.value)
+
+def add_timezone_to_timestamp(x, tz='America/Toronto'):
+    '''
+    Convert a timestamp in format YYYY-mm-dd HH:MM:SS without timezone to a timestamp with timezone.
+    '''
+    return (
+        datetime.strptime(x, '%Y-%m-%d %H:%M:%S').
+        replace(tzinfo=ZoneInfo(tz))
+    )
+
+
+def convert_datetime_to_utc(x):
+    return x.astimezone(ZoneInfo('UTC'))
