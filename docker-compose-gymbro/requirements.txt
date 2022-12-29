@@ -1,0 +1,5 @@
+pytest==7.2.0
+python-dotenv==0.21.0
+tweepy==4.12.1
+pytest-cov==4.0.0
+pandas==1.5.2

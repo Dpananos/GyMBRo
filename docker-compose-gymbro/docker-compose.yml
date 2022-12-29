@@ -1,5 +1,8 @@
 version: 'latest'
 services:
+  python-server:
+    build: .
+  
   database-server:
     image: postgres:latest
     restart: always
