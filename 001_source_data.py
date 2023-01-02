@@ -17,6 +17,8 @@ logging.basicConfig(
 
 
 def main():
+
+    load_dotenv()
         
     user = TwitterUser(id=297549322, username="WesternWeightRm")
     api_keys = TwitterApiKeys.from_env()
@@ -27,7 +29,8 @@ def main():
         cursor = con.cursor()
 
         latest_observation_query= 'SELECT "id" FROM fact_tweets order by created_at_utc desc LIMIT 1'
-        latest_observation = cursor.execute(latest_observation_query)
+        cursor.execute(latest_observation_query)
+        latest_observation = cursor.fetchall()
 
         if latest_observation:
             latest_tweet_id = latest_observation[0][0]
