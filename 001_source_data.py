@@ -33,8 +33,10 @@ def main():
 
         cursor = con.cursor()
 
-        latest_observation_query= 'SELECT "id" FROM fact_tweets order by created_at_utc desc LIMIT 1'
-        cursor.execute(latest_observation_query)
+        # Its more efficient to only grab tweets we haven't see before
+        # Run a query to get the last tweet we have in our database
+        # and pass that to the scraper
+        cursor.execute('SELECT "id" FROM fact_tweets order by created_at_utc desc LIMIT 1')
         latest_observation = cursor.fetchall()
 
         if latest_observation:
@@ -45,9 +47,7 @@ def main():
         tweets = scraper.get_tweets(more_tweets=True, max_results=100, since_id=latest_tweet_id)
 
         if tweets:
-
             logging.info(f"Found new tweets for")
-
             for tweet in tweets:
 
                 cursor.execute(
