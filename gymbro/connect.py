@@ -2,6 +2,7 @@ import psycopg2
 from dotenv import dotenv_values
 from dataclasses import dataclass
 import os
+import sqlalchemy
 
 @dataclass
 class SqlConnection:
@@ -21,10 +22,15 @@ class SqlConnection:
             password=self.password,
         )
 
+    def connect_sqlalchemy(self):
+        return sqlalchemy.create_engine(
+            f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
+        )
+
     @classmethod
     def from_env(cls, file_path=None):
 
-        if file_path:
+        if not file_path:
             config = dotenv_values(file_path)
         else:
             config = os.environ
