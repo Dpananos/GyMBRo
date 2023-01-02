@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser
 from gymbro.connect import SqlConnection
 
-load_dotenv()
-
 # Set up logging for scraping tweets
 today = date.today().strftime("%Y-%m-%d")
 log_file = f"logs/{today}.log"
@@ -45,7 +43,7 @@ def main():
             for tweet in tweets:
 
                 cursor.execute(
-                    "INSERT INTO fact_tweets (id, created_at_utc, author_id, text) VALUES (%s, %s, %s, %s)",
+                    "INSERT INTO fact_tweets (id, created_at_utc, author_id, tweet) VALUES (%s, %s, %s, %s)",
                     (tweet.id, tweet.created_at, tweet.author_id, tweet.text),
                 )
 

@@ -1,7 +1,7 @@
 import psycopg2
 from dotenv import dotenv_values
 from dataclasses import dataclass
-
+import os
 
 @dataclass
 class SqlConnection:
@@ -24,15 +24,16 @@ class SqlConnection:
     @classmethod
     def from_env(cls, file_path=None):
 
-        if not file_path:
-            file_path = ".env"
+        if file_path:
+            config = dotenv_values(file_path)
+        else:
+            config = os.environ
 
-        config = dotenv_values(file_path)
 
         return cls(
-            host=config["DB_HOST"],
-            port=config["DB_PORT"],
-            database=config["DB_NAME"],
-            user=config["DB_USER"],
-            password=config["DB_PASSWORD"],
+            host=config["POSTGRES_HOST"],
+            port=config["POSTGRES_PORT"],
+            database=config["POSTGRES_DB"],
+            user=config["POSTGRES_USER"],
+            password=config["POSTGRES_PASSWORD"],
         )

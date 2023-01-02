@@ -1,0 +1,6 @@
+psycopg2==2.9.5
+pytest==7.2.0
+python-dotenv==0.21.0
+tweepy==4.12.1
+sqlalchemy==1.4.39
+pandas==1.5.2
