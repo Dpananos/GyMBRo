@@ -8,12 +8,17 @@ from gymbro.connect import SqlConnection
 today = date.today().strftime("%Y-%m-%d")
 log_file = f"logs/{today}.log"
 
+logger = logging.getLogger("tweepy")
+logger.setLevel(logging.INFO)
+
+
 logging.basicConfig(
     filename=log_file,
     encoding="utf-8",
     level=logging.DEBUG,
     format="%(asctime)s:%(filename)s:%(levelname)s:%(name)s:%(message)s",
 )
+
 
 
 def main():
