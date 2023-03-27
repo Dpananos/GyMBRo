@@ -22,10 +22,10 @@ wr <- con %>%
 DBI::dbDisconnect(con)
 
 train_set <- wr %>% 
-             filter(year(created_at) < 2019)
+             filter(year(created_at) <=2020)
 
 test_set <- wr %>% 
-            filter(year(created_at) >= 2019)
+            filter(year(created_at) > 2020)
 
 # Make a list of lists that house the walk forward validation
 # Need an array for indicies.  Making the validation sets requires telling
@@ -37,7 +37,7 @@ ix = seq(1, nrow(train_set))
 # 2014 - 2015 vs rest
 # Leave 2019 and later as a test set.
 # This code below creates a list of train/test indicies
-split_ix<-map(2014:2017, ~{
+split_ix<-map(2014:2018, ~{
   analysis <- ix[year(train_set$created_at) <= .x]
   assessment <- ix[year(train_set$created_at) > .x]
   list(analysis=analysis, assessment=assessment)
@@ -46,7 +46,7 @@ split_ix<-map(2014:2017, ~{
 # Use the indicies and manual_rset to create an object which can be passed
 # to tidymodels directly.
 cv <- lapply(split_ix, make_splits, train_set) %>% 
-      manual_rset(str_c('Split', 2015:2018))
+      manual_rset(str_c('Split', 2015:2019))
 
 
 # Create a helper function for feature engineering.

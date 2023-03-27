@@ -30,7 +30,7 @@ log_info("----Creating Plot----")
 # Add geoms to the plot
 base_plot <- predictions %>% 
   ggplot(aes(created_at, .pred )) + 
-  geom_line(aes(color='Predicted WR Numbers'), size=1)
+  geom_line(aes(color='Predicted'), size=1)
 
 if (nrow(observed) > 0){
   base_plot = base_plot + 
@@ -45,7 +45,7 @@ full_plot<-base_plot +
   scale_y_continuous(limits = c(0, NA)) + 
   scale_x_datetime(labels = fmt_dt, date_breaks = '4 hours') + 
   labs(
-    subtitle = 'How Many People Will Be In The Weight Room?',
+    # subtitle = 'How Many People Will Be In The Weight Room?',
     x = 'Time',
     y = 'People in Weight Room',
     color = '',
@@ -56,6 +56,7 @@ full_plot<-base_plot +
     panel.grid.major = element_line(),
     panel.grid.minor = element_line(size = 0.125),
     aspect.ratio = 1/2,
+    legend.text = element_text(size = 8),
     legend.position = 'top',
     plot.margin=grid::unit(c(1, 1, 1, 1), "mm")
   )
