@@ -1,10 +1,9 @@
 import tweepy
 import pytest
-from datetime import datetime
-from gymbro.connect import SqlConnection
+from dotenv import load_dotenv
 from gymbro.scrape import Scraper, TwitterApiKeys, TwitterUser
 
-
+load_dotenv()
 user = TwitterUser(id=297549322, username="WesternWeightRm")
 api_keys = TwitterApiKeys.from_env()
 scraper = Scraper(user=user, api_keys=api_keys)

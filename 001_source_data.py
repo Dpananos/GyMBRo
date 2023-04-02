@@ -20,23 +20,22 @@ logging.basicConfig(
 )
 
 
-
 def main():
-
     load_dotenv()
-        
+
     user = TwitterUser(id=297549322, username="WesternWeightRm")
     api_keys = TwitterApiKeys.from_env()
     scraper = Scraper(user=user, api_keys=api_keys)
 
     with SqlConnection.from_env().connect() as con:
-
         cursor = con.cursor()
 
         # Its more efficient to only grab tweets we haven't see before
         # Run a query to get the last tweet we have in our database
         # and pass that to the scraper
-        cursor.execute('SELECT "id" FROM fact_tweets order by created_at_utc desc LIMIT 1')
+        cursor.execute(
+            'SELECT "id" FROM fact_tweets order by created_at_utc desc LIMIT 1'
+        )
         latest_observation = cursor.fetchall()
 
         if latest_observation:
@@ -44,14 +43,15 @@ def main():
         else:
             latest_tweet_id = None
 
-        tweets = scraper.get_tweets(more_tweets=True, max_results=100, since_id=latest_tweet_id)
+        tweets = scraper.get_tweets(
+            more_tweets=True, max_results=100, since_id=latest_tweet_id
+        )
 
         if tweets:
-            logging.info(f"Found new tweets for")
+            logging.info(f"Found new tweets for {user.username}")
             for tweet in tweets:
-
                 cursor.execute(
-                    "INSERT INTO fact_tweets (id, created_at_utc, author_id, tweet) VALUES (%s, %s, %s, %s)",
+                    "INSERT INTO fact_tweets (id, created_at_utc, author_id, text) VALUES (%s, %s, %s, %s)",
                     (tweet.id, tweet.created_at, tweet.author_id, tweet.text),
                 )
 
