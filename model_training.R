@@ -76,7 +76,7 @@ model_grid <- grid_latin_hypercube(
   sample_size = sample_prop(),
   finalize(mtry(), train_set),
   learn_rate(),
-  size = 500
+  size = 1000
 )
 
 model_wf <- workflow() %>%
