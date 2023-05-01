@@ -1,4 +1,3 @@
-import psycopg2
 from dotenv import dotenv_values
 from dataclasses import dataclass
 import os
@@ -14,13 +13,7 @@ class SqlConnection:
         self.password = password
 
     def connect(self):
-        return psycopg2.connect(
-            host=self.host,
-            port=self.port,
-            database=self.database,
-            user=self.user,
-            password=self.password,
-        )
+        return self.connect_sqlalchemy()
 
     def connect_sqlalchemy(self):
         return sqlalchemy.create_engine(
